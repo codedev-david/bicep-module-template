@@ -1,0 +1,5 @@
+{
+    "itemDisplayName": "Display Name of the Template",
+    "description": "Short description of the bicep module",
+    "summary": "longer description of the bicep module with uses and what this module creates in azure; possible dependencies"
+  }
