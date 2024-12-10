@@ -1,11 +1,11 @@
-param env string = 'dev'
+param env string = 'main'
 
 // The env parameter will be passed in from the CLI when the deployment is run on the pipeline. 
 @description('Load storage account configurations from YAML file depending on the environment')
-var env_values = [env == 'dev' ? loadYamlContent('./dev_values.yml'): env == 'test' ? loadYamlContent('./test_values.yml'): env == 'stage' ? loadYamlContent('./stage_values.yml'): env == 'prod' ? loadYamlContent('./prod_values.yml'): env]
+var env_values = env == 'dev' ? loadYamlContent('./dev_values.yml'): env == 'test' ? loadYamlContent('./test_values.yml'): env == 'stage' ? loadYamlContent('./stage_values.yml'): env == 'prod' ? loadYamlContent('./prod_values.yml'): env == 'main' ? loadYamlContent('./main_values.yml'): env
 
 
-module storageAccounts '../template.bicep' = [for sa in env_values: {
+module storageAccounts '../template.bicep' = [for sa in env_values.sa_array: {
   name: '${sa.name}-${uniqueString(resourceGroup().id)}'
   params: {
     name: sa.name
@@ -15,3 +15,6 @@ module storageAccounts '../template.bicep' = [for sa in env_values: {
     accessTier: sa.accessTier
   }
 }]
+
+
+output storageAccountName array = env_values.sa_array
