@@ -1,0 +1,83 @@
+trigger: none
+
+parameters:
+  - name: deployRG
+    displayName: Resource Groups for IaC Deployment
+    type: string
+    default: 'iac-module-testing'
+    values: 
+      - iac-module-testing  # Add this to the list
+      - rgname1
+      - rgname2
+      - rgname3
+    
+  - name: env
+    displayName: Environment to deploy Bicep
+    type: string
+    default: main
+    values:
+      - main
+      - Production
+      - Stage
+      - Test
+      - Dev
+
+  - name: bicepFilePath
+    displayName: Path to the bicep template file for deploying IaC
+    type: string
+    default: 'example/template_example.bicep'   
+
+  - name: publishVersion
+    displayName: Enter version for module using Semantic versioning (Major.Minor.Path)
+    type: string
+    default: 'fill in with X.Y.Z'
+
+  - name: runCleanUp
+    displayName: flag to run CleanUp Stage, set to true if wiping out resources
+    default: false
+    
+  - name: runPublish
+    displayName: flag to run Publish Stage, set to true if publishing
+    default: false
+
+# this variable group should contain variable named DeployServiceConnection with the value of the ServiceConnection
+variables:
+  - group: iacPipelineValues
+
+resources:
+  repositories:
+    - repository: sdlc-repo
+      type: git
+      name: IaC/testing-pipelines  # Name of the repository containing the template
+      ref: refs/heads/main  
+
+
+stages:
+  - template: format.yml@sdlc-repo
+    parameters:
+      bicepFilePath: ${{parameters.bicepFilePath}}
+  - template: lint.yml@sdlc-repo
+    parameters:
+      bicepFilePath: ${{parameters.bicepFilePath}}
+  - template: validate.yml@sdlc-repo
+    parameters:
+      DeployServiceConnection: $(DeployServiceConnection)
+      bicepFilePath: ${{parameters.bicepFilePath}}
+      resourceGroup: ${{parameters.deployRG}}
+      env: ${{parameters.env}}
+  - template: deploy.yml@sdlc-repo
+    parameters:
+      DeployServiceConnection: $(DeployServiceConnection)
+      bicepFilePath: ${{parameters.bicepFilePath}}
+      resourceGroup: ${{parameters.deployRG}}
+      env: ${{parameters.env}}
+  - template: cleanup.yml@sdlc-repo #have this dependent on a parameter flag for cleanup
+    parameters:
+      DeployServiceConnection: $(DeployServiceConnection)
+      resourceGroup: ${{parameters.deployRG}}
+      runCleanUp: ${{parameters.runCleanUp}}
+  - template: publish.yml@sdlc-repo #have this dependent on a parameter flag for cleanup
+    parameters:
+      PublishingServiceConnection: $(PublishingServiceConnection)
+      publishVersion: ${{parameters.publishVersion}}
+      runPublish: ${{parameters.runPublish}}
