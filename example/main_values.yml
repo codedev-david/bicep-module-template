@@ -1,11 +1,11 @@
 sa_array:
   - name: example-main-1
     sku: Standard_LRS
-    kind: StorageV2
-    accessTier: Hot
+    kind: BlobStorage
+    accessTier: Cool
     location: eastus
   - name: example-main-2
     sku: Standard_GRS
-    kind: Storage
+    kind: BlobStorage
     accessTier: Cool
-    location: westus
+    location: eastus

@@ -20,7 +20,7 @@ param accessTier string
 // ALL required properties as well as optional values we currently use in MSI should be parameterized.
 
 resource storageAccounts 'Microsoft.Storage/storageAccounts@2023-05-01' = {
-  name: '${name}-${uniqueString(resourceGroup().id)}'
+  name: '${name}${uniqueString(resourceGroup().id)}'
   location: location
   sku: {
     name: sku

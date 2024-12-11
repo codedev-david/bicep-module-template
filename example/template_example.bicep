@@ -6,7 +6,7 @@ var env_values = env == 'dev' ? loadYamlContent('./dev_values.yml'): env == 'tes
 
 
 module storageAccounts '../template.bicep' = [for sa in env_values.sa_array: {
-  name: '${sa.name}-${uniqueString(resourceGroup().id)}'
+  name: '${sa.name}${uniqueString(resourceGroup().id)}'
   params: {
     name: sa.name
     location: sa.location
