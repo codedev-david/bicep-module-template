@@ -1,88 +1,76 @@
-# Display Name of the Template
+# bicep-module-template Module Documentation
 
-longer description of the bicep module with uses and what this module creates in azure; possible dependencies
-
-Short description of the bicep module
+## Resources
+- storageAccounts: Microsoft.Storage/storageAccounts@2023-05-01
 
 ## Parameters
-
-Parameter name | Required | Description
--------------- | -------- | -----------
-name           | Yes      | The name of the application
-location       | Yes      | The location of the storage account.
-sku            | Yes      | The SKU of the storage account.
-kind           | Yes      | The kind of the storage account.
-accessTier     | Yes      | The access tier of the storage account.
-
-### name
-
-![Parameter Setting](https://img.shields.io/badge/parameter-required-orange?style=flat-square)
-
-The name of the application
-
-### location
-
-![Parameter Setting](https://img.shields.io/badge/parameter-required-orange?style=flat-square)
-
-The location of the storage account.
-
-### sku
-
-![Parameter Setting](https://img.shields.io/badge/parameter-required-orange?style=flat-square)
-
-The SKU of the storage account.
-
-### kind
-
-![Parameter Setting](https://img.shields.io/badge/parameter-required-orange?style=flat-square)
-
-The kind of the storage account.
-
-### accessTier
-
-![Parameter Setting](https://img.shields.io/badge/parameter-required-orange?style=flat-square)
-
-The access tier of the storage account.
+| Name          | Type   |
+|---------------|--------|
+| name | string |
+| location | string |
+| sku | string |
+| kind | string |
+| accessTier | string |
 
 ## Outputs
+| Name                   | Type   | Value                                    |
+|------------------------|--------|------------------------------------------|
+| storageAccountName        | string | storageAccounts.name |
+| storageAccountId        | string | storageAccounts.id |
+| primaryEndpoints        | object | storageAccounts.properties.primaryEndpoints |
+| primaryBlobEndpoint        | string | storageAccounts.properties.primaryEndpoints.blob |
+| provisioningState        | string | storageAccounts.properties.provisioningState |
+| resourceLocation        | string | storageAccounts.location |
 
-Name | Type | Description
----- | ---- | -----------
-storageAccountName | string |
-storageAccountId | string |
-primaryEndpoints | object |
-primaryBlobEndpoint | string |
-provisioningState | string |
-resourceLocation | string |
+## Sample Inputs
+```yaml
+sa_array:
+  - name: example-sa1
+    sku: Standard_LRS
+    kind: StorageV2
+    accessTier: Hot
+    location: eastus
+  - name: example-sa2
+    sku: Standard_GRS
+    kind: Storage
+    accessTier: Cool
+    location: westus
 
-## Snippets
-
-### Parameter file
-
-```json
-{
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "metadata": {
-        "template": "bicep-module-template/template.json"
-    },
-    "parameters": {
-        "name": {
-            "value": ""
-        },
-        "location": {
-            "value": ""
-        },
-        "sku": {
-            "value": ""
-        },
-        "kind": {
-            "value": ""
-        },
-        "accessTier": {
-            "value": ""
-        }
-    }
-}
 ```
 
+## Examples
+
+### Example Bicep Code
+```bicep
+param env string = 'dev'
+
+// The env parameter will be passed in from the CLI when the deployment is run on the pipeline. 
+@description('Load storage account configurations from YAML file depending on the environment')
+var env_values = [env == 'dev' ? loadYamlContent('./dev_values.yml'): env == 'test' ? loadYamlContent('./test_values.yml'): env == 'stage' ? loadYamlContent('./stage_values.yml'): env == 'prod' ? loadYamlContent('./prod_values.yml'): env]
+
+
+module storageAccounts '../template.bicep' = [for sa in env_values: {
+  name: '${sa.name}-${uniqueString(resourceGroup().id)}'
+  params: {
+    name: sa.name
+    location: sa.location
+    sku: sa.sku
+    kind: sa.kind
+    accessTier: sa.accessTier
+  }
+}]
+
+```
+
+### Calling the Bicep Module from Azure ACR
+```bicep
+
+module bicep-module-template 'iacbicep.azurecr.io/bicep-module-template:vX.Y.Z' = {
+  name: 'exampleDeployment'
+  params: {
+    location: 'eastus'
+    param1: 'value1'
+  }
+}
+
+```

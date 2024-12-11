@@ -48,7 +48,7 @@ resources:
   repositories:
     - repository: sdlc-repo
       type: git
-      name: IaC/testing-pipelines  # Name of the repository containing the template
+      name: IaC/sdlc-iac-stages  # Name of the repository containing the template
       ref: refs/heads/main  
 
 

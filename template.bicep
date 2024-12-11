@@ -1,4 +1,3 @@
-
 // ***PARAMETERS***//
 // at the most basic level, bicep parameters should have a name, type, and description. 
 
@@ -17,11 +16,10 @@ param kind string
 @description('The access tier of the storage account.')
 param accessTier string
 
-
 // ***RESOURCES***//
 // ALL required properties as well as optional values we currently use in MSI should be parameterized.
 
-resource storageAccounts 'Microsoft.Storage/storageAccounts@2023-05-01' =  {
+resource storageAccounts 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: '${name}-${uniqueString(resourceGroup().id)}'
   location: location
   sku: {
@@ -33,8 +31,6 @@ resource storageAccounts 'Microsoft.Storage/storageAccounts@2023-05-01' =  {
   }
 }
 
-
-
 // ***OUTPUTS***//
 // Outputs are used to return information about the resources that were created.
 output storageAccountName string = storageAccounts.name
@@ -43,4 +39,3 @@ output primaryEndpoints object = storageAccounts.properties.primaryEndpoints
 output primaryBlobEndpoint string = storageAccounts.properties.primaryEndpoints.blob
 output provisioningState string = storageAccounts.properties.provisioningState
 output resourceLocation string = storageAccounts.location
-

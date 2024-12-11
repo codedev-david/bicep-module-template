@@ -1,10 +1,10 @@
 sa_array:
-  - name: example-sa1
+  - name: example-dev
     sku: Standard_LRS
     kind: StorageV2
     accessTier: Hot
     location: eastus
-  - name: example-sa2
+  - name: example-dev2
     sku: Standard_GRS
     kind: Storage
     accessTier: Cool
