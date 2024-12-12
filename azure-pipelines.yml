@@ -1,3 +1,6 @@
+pool:
+  vmImage: 'windows-latest'
+
 trigger: none
 
 parameters:
@@ -25,7 +28,7 @@ parameters:
   - name: bicepFilePath
     displayName: Path to the bicep template file for deploying IaC
     type: string
-    default: 'example/template_example.bicep'   
+    default: 'example/template_example.bicep'
 
   - name: publishVersion
     displayName: Enter version for module using Semantic versioning (Major.Minor.Path)
@@ -34,10 +37,12 @@ parameters:
 
   - name: runCleanUp
     displayName: flag to run CleanUp Stage, set to true if wiping out resources
+    type: boolean
     default: false
     
   - name: runPublish
     displayName: flag to run Publish Stage, set to true if publishing
+    type: boolean
     default: false
 
 # this variable group should contain variable named DeployServiceConnection with the value of the ServiceConnection
@@ -49,16 +54,18 @@ resources:
     - repository: sdlc-repo
       type: git
       name: IaC/sdlc-iac-stages  # Name of the repository containing the template
-      ref: refs/heads/main  
+      ref: refs/tags/v1.0.0 #use current version of SDLC pipeline
 
 
 stages:
   - template: format.yml@sdlc-repo
     parameters:
       bicepFilePath: ${{parameters.bicepFilePath}}
+      DeployServiceConnection: $(DeployServiceConnection)
   - template: lint.yml@sdlc-repo
     parameters:
       bicepFilePath: ${{parameters.bicepFilePath}}
+      DeployServiceConnection: $(DeployServiceConnection)
   - template: validate.yml@sdlc-repo
     parameters:
       DeployServiceConnection: $(DeployServiceConnection)
