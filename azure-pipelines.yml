@@ -13,6 +13,11 @@ parameters:
       - rgname1
       - rgname2
       - rgname3
+      
+  - name: wipeResourceGroup
+    displayName: Wipe Resource Group
+    type: boolean
+    default: false
     
   - name: env
     displayName: Environment to deploy Bicep
