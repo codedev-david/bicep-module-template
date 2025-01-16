@@ -13,12 +13,7 @@ parameters:
       - rgname1
       - rgname2
       - rgname3
-      
-  - name: wipeResourceGroup
-    displayName: Wipe Resource Group
-    type: boolean
-    default: false
-    
+
   - name: env
     displayName: Environment to deploy Bicep
     type: string
@@ -40,13 +35,18 @@ parameters:
     type: string
     default: 'fill in with X.Y.Z'
 
-  - name: runCleanUp
-    displayName: flag to run CleanUp Stage, set to true if wiping out resources
+  - name: runModuleCleanUp
+    displayName: flag to run CleanUp RG--for module pipeline ONLY
     type: boolean
     default: false
     
   - name: runPublish
-    displayName: flag to run Publish Stage, set to true if publishing
+    displayName: flag to run Publish Stage, set to true if publishing module to ACR
+    type: boolean
+    default: false
+
+  - name: cleanRG
+    displayName: flag to wipe resources in RG; use outside of module pipeline
     type: boolean
     default: false
 
@@ -59,7 +59,7 @@ resources:
     - repository: sdlc-repo
       type: git
       name: IaC/sdlc-iac-stages  # Name of the repository containing the template
-      ref: refs/tags/v1.0.0 #use current version of SDLC pipeline
+      ref: refs/tags/v1.0.0 
 
 
 stages:
@@ -82,12 +82,14 @@ stages:
       DeployServiceConnection: $(DeployServiceConnection)
       bicepFilePath: ${{parameters.bicepFilePath}}
       resourceGroup: ${{parameters.deployRG}}
+      runModuleCleanUp: ${{parameters.runModuleCleanUp}}
       env: ${{parameters.env}}
   - template: cleanup.yml@sdlc-repo #have this dependent on a parameter flag for cleanup
     parameters:
       DeployServiceConnection: $(DeployServiceConnection)
       resourceGroup: ${{parameters.deployRG}}
-      runCleanUp: ${{parameters.runCleanUp}}
+      runModuleCleanUp: ${{parameters.runModuleCleanUp}}
+      cleanRG: ${{parameters.cleanRG}}
   - template: publish.yml@sdlc-repo #have this dependent on a parameter flag for cleanup
     parameters:
       PublishingServiceConnection: $(PublishingServiceConnection)
