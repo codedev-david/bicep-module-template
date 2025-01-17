@@ -116,6 +116,9 @@ if __name__ == '__main__':
     acr_registry_name = 'iacbicep.azurecr.io'
     bicep_module_version = ':vX.Y.Z'
 
+    # Strip everything before the first dash and the dash itself
+    stripped_folder_name = re.sub(r'^[^-]*-', '', current_folder_name)
+
     for root, _, files in os.walk('.'):
         for file in files:
             if file.endswith('.bicep'):
@@ -142,7 +145,7 @@ if __name__ == '__main__':
                 example_inputs_content = f.read()
 
         acr_example = f"""
-module {current_folder_name} 'br:{acr_registry_name}/{current_folder_name}{bicep_module_version}' = {{
+module {stripped_folder_name} 'br:{acr_registry_name}/{stripped_folder_name}{bicep_module_version}' = {{
   name: 'exampleDeployment'
   params: {{
     location: 'eastus'
