@@ -92,6 +92,6 @@ stages:
       cleanRG: ${{parameters.cleanRG}}
   - template: publish.yml@sdlc-repo #have this dependent on a parameter flag for cleanup
     parameters:
-      PublishingServiceConnection: $(PublishingServiceConnection)
+      DeployServiceConnection: $(DeployServiceConnection)
       publishVersion: ${{parameters.publishVersion}}
       runPublish: ${{parameters.runPublish}}
