@@ -28,25 +28,10 @@ parameters:
   - name: bicepFilePath
     displayName: Path to the bicep template file for deploying IaC
     type: string
-    default: 'example/template_example.bicep'
+    default: 'example/app-service-plan_example.bicep'
 
-  - name: publishVersion
-    displayName: Enter version for module using Semantic versioning (Major.Minor.Path)
-    type: string
-    default: 'fill in with X.Y.Z'
-
-  - name: runModuleCleanUp
-    displayName: flag to run CleanUp RG--for module pipeline ONLY
-    type: boolean
-    default: false
-    
-  - name: runPublish
-    displayName: flag to run Publish Stage, set to true if publishing module to ACR
-    type: boolean
-    default: false
-
-  - name: cleanRG
-    displayName: flag to wipe resources in RG; use outside of module pipeline
+  - name: appEnvDeploy
+    displayName: normal app deploy outside of module creation (uses declared RG)
     type: boolean
     default: false
 
@@ -82,16 +67,12 @@ stages:
       DeployServiceConnection: $(DeployServiceConnection)
       bicepFilePath: ${{parameters.bicepFilePath}}
       resourceGroup: ${{parameters.deployRG}}
-      runModuleCleanUp: ${{parameters.runModuleCleanUp}}
+      appEnvDeploy: ${{parameters.appEnvDeploy}}
       env: ${{parameters.env}}
   - template: cleanup.yml@sdlc-repo #have this dependent on a parameter flag for cleanup
     parameters:
       DeployServiceConnection: $(DeployServiceConnection)
       resourceGroup: ${{parameters.deployRG}}
-      runModuleCleanUp: ${{parameters.runModuleCleanUp}}
-      cleanRG: ${{parameters.cleanRG}}
   - template: publish.yml@sdlc-repo #have this dependent on a parameter flag for cleanup
     parameters:
       DeployServiceConnection: $(DeployServiceConnection)
-      publishVersion: ${{parameters.publishVersion}}
-      runPublish: ${{parameters.runPublish}}
